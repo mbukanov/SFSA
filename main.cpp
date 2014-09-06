@@ -6,6 +6,9 @@
 #include <iostream>
 #include <time.h>
 #include <map>
+#include <utility>
+#include <complex>
+#include <tuple>
 #include <algorithm>
 #include "mols/mols.h"
 
@@ -28,22 +31,54 @@ int main(int ac,char *argv[])
     {
         //std::cout<<"day: "<<i->first<<" | bytes: "<<i->second<<std::endl;
         xv.push_back((float)(i->first));
-        yv.push_back(i->second);
-
+        yv.push_back(i->second + sum);
         sum += i->second;
     }
 
-
     MOLS mols(xv, yv);
-    mols.defK();
-    mols.defB();
-    float limit = 100 * 1024; /// 100mb limit
-    mols.defX(limit); // defined day of free space end
+    mols.defW();
 
-    printf("LIMIT: %f\n", mols.getX());
+    Matrix<float> A;
+    Matrix<float> w;
+    Matrix<float> b;
+    //A.addElements(mols.getA().getElements());//.mulMatrix(mols.getW());
+    A = mols.getX();
 
-    printf("SUM: %f\n", sum);
+    int c = (mols.getX()).getSize().rows;
+    std::cout<<c<<std::endl;
 
+    w = mols.getW();
+    mols.defY();
+
+    Matrix<float> Y = mols.getY();
+    Matrix<float> X = mols.getX();
+
+    int rows = Y.getSize().rows;
+    Elements<float> elY = Y.getElements();
+    Elements<float> elX = X.getElements();
+    
+    std::vector< std::pair<float, float>* > values;
+    int jj;
+    for(jj = 1; jj <= X.getSize().rows; jj++)
+    {
+        values.push_back(new std::pair<float, float>(X.getElement(jj, 2), 0));
+    }
+
+
+    Elements<float>::iterator it;
+    int ki = 0;
+    for(it = elY.begin(); it != elY.end(); it++)
+    {
+        values[ki]->second = (*it)->getValue();
+        ki++;
+    }
+
+    std::vector<std::pair<float, float> * >::iterator iter;
+    for(iter = values.begin(); iter != values.end(); iter++)
+    {
+        std::cout<<(*iter)->first<<"; "<<(*iter)->second<<std::endl;
+    }
+ 
 
     return 0;
 }
@@ -100,7 +135,8 @@ void show_file_info(char *filename,struct stat *info_p)
     //printf("%-8s ",uid_to_name(info_p->st_uid));
     //printf("%-8s",gid_to_name(info_p->st_gid));
     tm* gmtm = gmtime(&(info_p->st_mtime));
-    file_list[gmtm->tm_yday] += (double)info_p->st_size/1024/1024;
+    if(gmtm->tm_yday != 0)
+        file_list[gmtm->tm_yday] += (double)info_p->st_size/1024/1024;
     //printf("%d ", gmtm->tm_yday);
     //printf("%8ld ", info_p->st_mtime);
 //printf("%8ld ",(long)info_p->st_size);

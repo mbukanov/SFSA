@@ -1,37 +1,32 @@
 /*
-    It's don't work. Need use linean regression
+qeed.
+I think it work. dunno.. :/
+I dont know
 */
 
 #include <stdio.h>
 #include <iostream>
 #include <vector>
-#include <matrix.h>
+#include "matrix.h"
 
-    class MOLS
-    {
-    public:
-    	MOLS(){};
-    	MOLS(std::vector<float> x, std::vector<float> y);
-    	void SetXValues(std::vector<float> x);
-    	void SetYValues(std::vector<float> y);
+class MOLS
+{
+public:
+    MOLS() {}
+    MOLS(std::vector<float> x, std::vector<float> y);
+    void defW();
+    void defY();
 
-    	/* y = kx + b */
-    	bool defK();
-    	bool defB();
-    	bool defY(float x);
-    	bool defX(float y);
-    	bool defFullY(float x);
+    Matrix<float> getW() { return _w; }
+    Matrix<float> getX() { return _X; }   
+    Matrix<float> getY() { return _Y; }
 
-    	float getK() { return this->_k; }
-    	float getB() { return this->_b; }
-    	float getY() { return this->_newY; }
-    	float getX() { return this->_newX; }
+private:
+    Matrix<float> _X;
+    Matrix<float> _Y;
+    Matrix<float> _w;
 
-    private:
-    	std::vector<float> _x;
-    	std::vector<float> _y;
-    	float _k;
-    	float _b;
-    	float _newY;
-    	float _newX;
-    };
+    std::vector<float> _x;
+    std::vector<float> _y;
+};
+ 

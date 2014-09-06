@@ -1,87 +1,44 @@
+#include "mols.h"
+
 MOLS::MOLS(std::vector<float> x, std::vector<float> y)
 {
-   	this->_x = x;
-   	this->_y = y;
+    _x = x;
+    _y = y;
 }
 
-void MOLS::SetXValues(std::vector<float> x)
+void MOLS::defW()
 {
-  	this->_x = x;
-}
+    Matrix<float> A(_x.size(), 3);
+    Matrix<float> At(3, _x.size());
+    int i;
 
-void MOLS::SetYValues(std::vector<float> y)
-{
-  	this->_y = y;
-}
-
-bool MOLS::defK()
-{
-    if(this->_x.empty() || this->_y.empty() || (this->_x.size() != this->_y.size()))
-    	return false;
-
-    int n = this->_x.size();
-	float sum_xy = 0;
-    float sum_x = 0;
-	float sum_y = 0;
-	float sum_x2 = 0;
-	int i;
-	for(i = 0; i < n; i++)
-	{
-	    sum_x += _x[i];
-	    sum_y += _y[i];
-	    sum_xy += _x[i]*_y[i];
-	    sum_x2 += _x[i]*_x[i];
+    // Create Matrix A
+    for(i = 1; i < _x.size(); i++)
+    {
+        A.setElement(i, 1, 1);
+        A.setElement(i, 2, _x[i-1]);
+        A.setElement(i, 3, _x[i-1]*_x[i-1]);
     }
-	    
-        printf("n = %d\n", n);
-	    printf("sum_x = %f\n", sum_x);
-	    printf("sum_y = %f\n", sum_y);
-	    printf("sum_xy = %f\n", sum_xy);
-	    printf("sum_x2 = %f\n", sum_x2);
-	    
-        printf("(n*sum_xy - sum_x*sum_y) = %f\n", ((float)n*sum_xy - sum_x*sum_y));
-        printf("(n*sum_x2 - sum_x*sum_x) = %f\n", ((float)n*sum_x2 - sum_x*sum_x));
-	    
-	this->_k = (n*sum_xy - sum_x*sum_y) / (n*sum_x2 - sum_x*sum_x);
-	return true;
+
+    //_A.addElements(A.getElements());
+    _X = A;
+
+    // At is transposition A
+    //At.setElements((A.Transposition()).getElements());
+    At = A.Transposition();
+
+    // def W
+    _w = ((At.mulMatrix(A)).Reverse()).mulMatrix(At.mulVector(_y)); // lisp? 
+    debugMatrix(_w);
 }
 
-bool MOLS::defB()
+void MOLS::defY()
 {
-    if(this->_x.empty() || this->_y.empty() || (this->_x.size() != this->_y.size()))
-        return false;
-
-    int n = _x.size();
-	int i = 0;
-	float sum_x = 0;
-	float sum_y = 0;
-	for(i = 0 ; i < n; i++)
-	{
-	   sum_x += _x[i];
-	   sum_y += _y[i];
-	}
-
-    this->_b = (sum_y - this->_k * sum_x) / n;
-
-	return true;
-}
-
-bool MOLS::defY(float x)
-{
-    this->_newY = _k*x+_b;
-    return true;
-}
-
-bool MOLS::defX(float y)
-{
-    this->_newX = (y - this->_b) / this->_k;
-    return true;
-}
-
-bool MOLS::defFullY(float x)
-{
-    if(!defK()) return false;
-    if(!defB()) return false;
-    if(!defY(x)) return false;
-    return true;
+    int i;
+    for(i = 1; i <= _X.getSize().rows; i++)
+    {
+        float value = _w.getElement(3, 1) * _X.getElement(i, 3) + _w.getElement(2, 1) * _X.getElement(i, 2) + _w.getElement(1, 1);
+        _Y.addElement(i, 1, value);
+    }
+    //_Y = _X.mulMatrix(_w);
 }

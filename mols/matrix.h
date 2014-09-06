@@ -59,7 +59,7 @@ public:
 	T getElement(int i, int j);
 	Elements<T> getElements();
 	MatrixElement<T>* getElementPoint(int i, int j);
-	void Transposition();
+	Matrix<T> Transposition();
 	Matrix<T> Reverse();
 	Matrix<T> mulMatrix(Matrix m);
 	Matrix<T> mulVector(std::vector<T> v);
@@ -134,7 +134,7 @@ bool Matrix<T>::isIdentity()
 template<class T>
 Size Matrix<T>::getSize()
 {
-	return size;
+	return this->size;
 }
 
 template<class T> 
@@ -164,17 +164,21 @@ void Matrix<T>::setElements(Elements<T> elmts)
 }
 
 template<class T> 
-void Matrix<T>::Transposition()
+Matrix<T> Matrix<T>::Transposition()
 {
 	typename Elements<T>::iterator it;
-	Matrix<T> tmp(size.rows, size.cols);
-	tmp.addElements(this->elements);
+	Matrix<T> srcMatrix(size.rows, size.cols);
+	Matrix<T> newMatrix(size.cols, size.rows);
 
-	Elements<T> el = tmp.getElements();
+	srcMatrix.setElements(getElements());
+
+	Elements<T> el = getElements();
 	for(it = el.begin(); it != el.end(); it++)
 	{
-		this->setElement((*it)->getCol(), (*it)->getRow(), (*it)->getValue()); /* i = j; j = i; */
+		newMatrix.setElement((*it)->getCol(), (*it)->getRow(), (*it)->getValue()); /* i = j; j = i; */
+		//this->setElement((*it)->getCol(), (*it)->getRow(), (*it)->getValue()); /* i = j; j = i; */
 	}
+	return newMatrix;
 }
 
 template<class T>
