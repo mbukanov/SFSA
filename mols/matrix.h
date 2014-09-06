@@ -10,7 +10,7 @@ qeed
 
 template<class T> class MatrixElement;
 template<class T> class Matrix;
-	
+
 /* need c++11 */	
 template<typename T>
 using Elements = std::set<MatrixElement<T>*>;
@@ -42,10 +42,8 @@ private:
 	int _j;
 	T Element;
 };
-
-template<typename T>
-using Elements = std::set<MatrixElement<T>*>;
-
+ 
+ 
 template<class T>
 class Matrix
 {
@@ -64,6 +62,11 @@ public:
 	void Transposition();
 	Matrix<T> Reverse();
 	Matrix<T> mulMatrix(Matrix m);
+	Matrix<T> mulVector(std::vector<T> v);
+	T Determinant();
+	int Search(T item, bool match, unsigned &uI, unsigned &uJ, unsigned starti, unsigned startj);
+	void swapRows(int row1, int rows2);
+	void swapCols(int col1, int col2);
 
 	bool isSquare();
 	bool isIdentity();
@@ -72,6 +75,32 @@ private:
 	Size size;
 	Elements<T> elements;
 };
+
+template<class T>
+int Matrix<T>::Search(T what, bool match, unsigned &uI, unsigned &uJ, unsigned starti, unsigned startj)
+{
+	//width = rows
+	// height = cols
+	if( (starti >= size.cols) || (startj >= size.rows) ) return 0;
+	for (unsigned i = starti; i < size.cols; i++)
+		for (unsigned j = startj; j < size.rows; j++)
+			if (match == true) 
+			{
+				if (getElement(i, i) == what) 
+				{
+					uI = i;
+					uJ = j;
+					return 1;
+				}
+			}else
+				if (getElement(i, j) != what) 
+				{
+					uI = i;
+					uJ = j;
+					return 1;
+				}
+	return 0;
+}
 
 template<class T>
 bool Matrix<T>::isSquare()
@@ -148,6 +177,32 @@ void Matrix<T>::Transposition()
 	}
 }
 
+template<class T>
+void Matrix<T>::swapRows(int row1, int row2)
+{
+	T temp = 0;
+	int col;
+	for( col = 1; col <= size.cols; col++ )
+	{
+		temp = getElement(row1, col);
+		setElement( row1, col, getElement(row2, col) );
+		setElement( row2, col, temp);
+	}
+}
+
+template<class T>
+void Matrix<T>::swapCols(int col1, int col2)
+{
+	T temp = 0;
+	int row;
+	for( row = 1; row <= size.rows; row++)
+	{
+		temp = getElement(row, col1);
+		setElement( row, col1, getElement(row, col2) );
+		setElement( row, col2, temp );
+	}
+}
+
 template<class T> 
 void Matrix<T>::setElement(int i, int j, T value)
 {
@@ -213,14 +268,6 @@ Matrix<T> Matrix<T>::mulMatrix(Matrix m)
 	Matrix<T> newMatrix(this->size.rows, m.getSize().cols);
 	if(size.cols != m.getSize().rows)
 		return newMatrix;
-	
-	typename Elements<T>::iterator its;
-	//Elements<T> elmts = elements; //newMatrix.getElements();
-	for(its = elements.begin(); its != elements.end(); its++)
-	{
-		//std::cout<<"row: "<<(*its)->getRow()<<" col: "<<(*its)->getCol()<<" value: "<<(*its)->getValue()<<std::endl;
-	}
-	
 
 	int i = 1;
 	int j = 1;
@@ -241,8 +288,23 @@ Matrix<T> Matrix<T>::mulMatrix(Matrix m)
 	return newMatrix;
 }
 
-// fucking A^(-1)
-// don't work! Fix it!
+template<class T>
+Matrix<T> Matrix<T>::mulVector(std::vector<T> v)
+{
+	// 1 column , v.size() rows
+	Matrix<T> newMatrix(v.size(), 1);
+	Matrix<T> srcMatrix(size.rows, size.cols);
+	srcMatrix.setElements(getElements());
+
+	unsigned i;
+	for(i = 1; i <= v.size(); i++)
+	{
+		newMatrix.setElement(i, 1, v[i-1]);
+	}
+
+	return srcMatrix.mulMatrix(newMatrix);
+}
+
 template<class T>
 Matrix<T> Matrix<T>::Reverse()
 {
@@ -253,67 +315,55 @@ Matrix<T> Matrix<T>::Reverse()
 		return rok;
 	}
 
-	Matrix<T> identityMatrix(size.rows, size.cols);
-	Matrix<T> newMatrix(size.rows, size.cols);
-	Matrix<T> reverseMatrix(size.rows, size.cols);
-	newMatrix.setElements(getElements());
-	reverseMatrix.setElements(getElements());
+	Matrix<T> srcMatrix(size.rows, size.cols);
+	Matrix<T> dstMatrix(size.rows, size.cols);
+	srcMatrix.setElements(getElements());
 
-	debugMatrix(*this);
-	std::cout<<std::endl;
-	debugMatrix(newMatrix);
-	std::cout<<std::endl;
-	debugMatrix(reverseMatrix);
-
-	int i, j, k; // counters
-	float temp;
-	// create identity matrix
-	for(i = 1; i <= size.rows; i++)
+	for(int i = 1; i <= size.rows; i++)
 	{
-		identityMatrix.setElement(i,i, 1);
+		dstMatrix.setElement(i,i, 1);
 	}
 
-	for (k = 1; k <= size.rows; k++)
-    {
-    	temp = newMatrix.getElement(k, k);
- 
-        for (j = 1; j <= size.rows; j++)
-        {
-        	newMatrix.setElement(k, j, (newMatrix.getElement(k, j) / temp ) );
-        	identityMatrix.setElement(k, j, (identityMatrix.getElement(k, j) / temp ) );
-        }
- 
-        for (i = k + 1; i <= size.rows; i++)
-        {
-        	temp = newMatrix.getElement(i, k);
- 
-            for (j = 1; j <= size.rows; j++)
-            {
-            	newMatrix.setElement(i, j, ( newMatrix.getElement(i, j) - newMatrix.getElement(k, j) * temp) );
-            	identityMatrix.setElement(i, j, ( identityMatrix.getElement(i, j) - identityMatrix.getElement(k, j) * temp) );
-            }
-        }
-    }
+	long double tmp;
+	unsigned i, j;
+	unsigned x, y;
 
-    for (k = size.rows - 1; k > 0; k--)
-    {
-        for (i = k - 1; i > 0; i--)
-        {
-        	temp = newMatrix.getElement(i, k);
- 
-            for (j = 1; j <= size.rows; j++)
-            {
-            	newMatrix.setElement(i, j, newMatrix.getElement(i,j) - newMatrix.getElement(k, j) * temp);
-            	identityMatrix.setElement(i, j, identityMatrix.getElement(i, j) - identityMatrix.getElement(k, j) * temp);
-            }
-        }
-    }
-  
-    for (i = 1; i < size.rows; i++)
-        for (j = 1; j < size.rows; j++)
-        	newMatrix.setElement(i, j, identityMatrix.getElement(i, j));
- 
-	return newMatrix;
+	for( unsigned i = 1; i <= size.rows; i++ )
+	{
+		if(srcMatrix.getElement(i, i) == 0)		
+		{
+			if(!srcMatrix.Search(0, false, y, x, i, i)) break;
+			if( i != y )
+			{
+				srcMatrix.swapRows(i, y);
+				dstMatrix.swapRows(i, y);
+			}
+			if(i != x)
+			{
+				srcMatrix.swapCols(i, x);
+				dstMatrix.swapCols(i, x);
+			}
+		}
+		tmp = srcMatrix.getElement(i, i);
+		for(x = 1; x <= size.cols; x++)
+		{
+			srcMatrix.setElement(i, x, srcMatrix.getElement(i, x) / tmp);
+			dstMatrix.setElement(i, x, dstMatrix.getElement(i, x) / tmp);
+		}
+
+		for(y = 1; y <= size.rows; y++)
+		{
+			if(y == i) continue;
+			tmp = srcMatrix.getElement(y, i);
+			for( x = 1; x <= size.cols; x++)
+			{
+				srcMatrix.setElement(y, x, (srcMatrix.getElement(y, x) - (srcMatrix.getElement(i, x) * tmp)));
+				dstMatrix.setElement(y, x, (dstMatrix.getElement(y, x) - (dstMatrix.getElement(i, x) * tmp)));
+			}
+		}
+	}
+
+	return dstMatrix;
 }
 
 template<class T> void debugMatrix(Matrix<T> m)
@@ -327,46 +377,3 @@ template<class T> void debugMatrix(Matrix<T> m)
 	}
 	std::cout<<std::endl;
 }
-
-/*
-int main(int argc, char **argv)
-{
-	Matrix<float> a(3,3);
-	a.setElement(1, 1, 1);
-	a.setElement(1, 2, 2);
-	a.setElement(1, 3, 3);
-	a.setElement(2, 1, 3);
-	a.setElement(2, 2, 4);
-	a.setElement(2, 3, 15);
-	a.setElement(3, 1, 6);
-	a.setElement(3, 2, 7);
-	a.setElement(3, 3, 8);
-	
-	Matrix<float> b(3,2);
-	b.setElement(1,1,6);
-	b.setElement(1,2,4);
-	b.setElement(2,1,3);
-	b.setElement(2,2,4);
-	b.setElement(3,1,5);
-	b.setElement(3,2,2);
-
-	debugMatrix(a);
-	std::cout<<std::endl;
-
-	Matrix<float> c = a.Reverse();
-	debugMatrix(c);
-
-	
-	Matrix<float> c = a.mulMatrix(b);
-
-	Elements<float>::iterator it;
-	Elements<float> el = c.getElements();
-	for(it = el.begin(); it != el.end(); it++)
-	{
-		std::cout<<(*it)->getValue()<<std::endl;
-	}
-	
- 
-	return 0;
-}
-*/

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
+#include <matrix.h>
 
     class MOLS
     {
@@ -34,4 +35,3 @@
     	float _newY;
     	float _newX;
     };
-
