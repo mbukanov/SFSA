@@ -16,6 +16,7 @@ public:
     MOLS(std::vector<float> x, std::vector<float> y);
     void defW();
     void defY();
+    float defTimeLimit(float sizeLimit);
 
     Matrix<float> getW() { return _w; }
     Matrix<float> getX() { return _X; }   

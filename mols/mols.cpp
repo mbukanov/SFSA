@@ -1,4 +1,5 @@
 #include "mols.h"
+#include <cmath>
 
 MOLS::MOLS(std::vector<float> x, std::vector<float> y)
 {
@@ -40,5 +41,25 @@ void MOLS::defY()
         float value = _w.getElement(3, 1) * _X.getElement(i, 3) + _w.getElement(2, 1) * _X.getElement(i, 2) + _w.getElement(1, 1);
         _Y.addElement(i, 1, value);
     }
+
+
     //_Y = _X.mulMatrix(_w);
+}
+
+
+// fix this
+float MOLS::defTimeLimit(float sizeLimit)
+{
+    // desciminant
+    float D = _w.getElement(2,1) * _w.getElement(2,1) - 4 * (_w.getElement(3,1) * (_w.getElement(1,1) - sizeLimit));
+    std::cout<<"D: "<<D<<std::endl;
+    std::cout<<"sqrt: "<<sqrt(D)<<std::endl;
+    float x1 = (-_w.getElement(2,1) + sqrt(D)) / (2 * _w.getElement(3,1));
+    float x2 = (-_w.getElement(2,1) - sqrt(D)) / (2 * _w.getElement(3,1));
+
+    std::cout<<"X1: "<<x1<<std::endl;
+    if(x2 > x1)
+        return x2;
+    else
+        return x1;
 }

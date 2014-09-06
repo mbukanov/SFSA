@@ -56,11 +56,17 @@ int main(int ac,char *argv[])
     int rows = Y.getSize().rows;
     Elements<float> elY = Y.getElements();
     Elements<float> elX = X.getElements();
-    
+
     std::vector< std::pair<float, float>* > values;
+    std::vector<int> skipVector;
     int jj;
     for(jj = 1; jj <= X.getSize().rows; jj++)
     {
+        if(X.getElement(jj, 2) == 0)
+        {
+            skipVector.push_back(jj-1);
+            continue;
+        }
         values.push_back(new std::pair<float, float>(X.getElement(jj, 2), 0));
     }
 
@@ -69,6 +75,9 @@ int main(int ac,char *argv[])
     int ki = 0;
     for(it = elY.begin(); it != elY.end(); it++)
     {
+        if(std::find(skipVector.begin(), skipVector.end(), ki) != skipVector.end())
+            continue;
+
         values[ki]->second = (*it)->getValue();
         ki++;
     }
@@ -78,6 +87,8 @@ int main(int ac,char *argv[])
     {
         std::cout<<(*iter)->first<<"; "<<(*iter)->second<<std::endl;
     }
+
+    std::cout<<"LIMIT: "<<mols.defTimeLimit(80*1024)<<std::endl;
  
 
     return 0;

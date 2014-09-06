@@ -68,6 +68,9 @@ public:
 	void swapRows(int row1, int rows2);
 	void swapCols(int col1, int col2);
 
+	void addRow();
+	void addCol();
+
 	bool isSquare();
 	bool isIdentity();
 
@@ -100,6 +103,18 @@ int Matrix<T>::Search(T what, bool match, unsigned &uI, unsigned &uJ, unsigned s
 					return 1;
 				}
 	return 0;
+}
+
+template<class T>
+void Matrix<T>::addRow()
+{
+	size.rows++;
+}
+
+template<class T>
+void Matrix<T>::addCol()
+{
+	size.cols++;
 }
 
 template<class T>
