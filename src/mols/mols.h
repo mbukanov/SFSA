@@ -10,8 +10,12 @@ I dont know.
 #include "../matrix.h"
 #include "../notification/notification.h"
 
+/*
+You can choose notification type
+*/
 
-class MOLS  : public Notification<NotificationEmail>
+template<class NotificationClass>
+class MOLS  : public Notification< NotificationClass >
 {
 public:
     MOLS() {}
