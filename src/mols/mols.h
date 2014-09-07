@@ -1,15 +1,17 @@
 /*
 qeed.
-I think it work. dunno.. :/
-I dont know
+I think it don't work. dunno.. :/
+I dont know.
 */
 
 #include <stdio.h>
 #include <iostream>
 #include <vector>
-#include "matrix.h"
+#include "../matrix.h"
+#include "../notification/notification.h"
 
-class MOLS
+
+class MOLS  : public Notification<NotificationEmail>
 {
 public:
     MOLS() {}

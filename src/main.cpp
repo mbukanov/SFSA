@@ -3,6 +3,7 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <iostream>
 #include <time.h>
 #include <map>
@@ -10,18 +11,20 @@
 #include <complex>
 #include <tuple>
 #include <algorithm>
+
 #include "mols/mols.h"
 
 void do_ls(char*);
 void dostat(char*,char*);
-void show_file_info(char*,struct stat*);
-void mode_to_letters(int,char*);
 
 std::map<int, double> file_list;
 
-int main(int ac,char *argv[])
+int main(int argc,char *argv[])
 {
-    int t = clock();
+    struct timeval start, end;
+    long mtime, secs, usecs;    
+    gettimeofday(&start, NULL);
+
     do_ls((char*)"/home/qeed/Video");
     //do_ls((char*)"/backup/");
 
@@ -55,7 +58,7 @@ int main(int ac,char *argv[])
     //debugMatrix(Y);
 
     // output
-
+/*
 
     int rows = Y.getSize().rows;
     Elements<double> elY = Y.getElements();
@@ -92,6 +95,8 @@ int main(int ac,char *argv[])
         std::cout<<(*iter)->first<<"; "<<(*iter)->second<<std::endl;
     }
 
+    */
+
     int last_i = Y.getSize().rows-1;
     int last_j = 2;
 
@@ -103,8 +108,14 @@ int main(int ac,char *argv[])
     std::cout<<"FREE SPACE LIMIT: "<<sizeLimit<<std::endl;
     std::cout<<"Free space ends at: "<<mols.defTimeLimit(sizeLimit) - X.getElement(last_i, last_j)<<" days."<<std::endl;
 
-    std::cout<<((double)t)/CLOCKS_PER_SEC<<" seconds"<<std::endl;
- 
+
+    gettimeofday(&end, NULL);
+    secs  = end.tv_sec  - start.tv_sec;
+    usecs = end.tv_usec - start.tv_usec;
+    mtime = ((secs) * 1000 + usecs/1000.0) + 0.5;
+    printf("Elapsed time: %ld millisecs\n", mtime);
+    
+    mols.Alert();
     return 0;
 }
 
@@ -148,30 +159,11 @@ void dostat(char *filename,char *dirname)
     if(stat(way_to_file,&info)==-1){
         printf("Error %s\n",way_to_file);
         perror(filename);
+    }else{
+        tm* gmtm = gmtime(&(info.st_mtime));
+        if(gmtm->tm_yday != 0)
+            file_list[gmtm->tm_yday] += (double)info.st_size/1024/1024; // MBytes
     }
-    else
-        show_file_info(filename,&info);
+    //show_file_info(filename,&info);
     delete way_to_file;
-}
-
-void show_file_info(char *filename,struct stat *info_p)
-{
-    //printf("%4d ", (int)info_p->st_nlink);
-    //printf("%-8s ",uid_to_name(info_p->st_uid));
-    //printf("%-8s",gid_to_name(info_p->st_gid));
-    tm* gmtm = gmtime(&(info_p->st_mtime));
-    if(gmtm->tm_yday != 0)
-        file_list[gmtm->tm_yday] += (double)info_p->st_size/1024/1024; // MBytes
-    //printf("%d ", gmtm->tm_yday);
-    //printf("%8ld ", info_p->st_mtime);
-//printf("%8ld ",(long)info_p->st_size);
-//printf("%.12s ",4+ctime(&(info_p->st_mtime)));
-//std::cout<<4+ctime(&(info_p->st_mtime))<<std::endl;
- //printf("%s\n",filename);
-
-//    tm* gmtm = gmtime(&(info_p->st_mtime));
-    /*
-    printf("sec: %d\nmin:%d\nhour+4: %d\nmday: %d\nmon: %d\nyear: %d\nwday: %d\nyday: %d\nisdst: %d\n",
-            gmtm->tm_sec, gmtm->tm_min, gmtm->tm_hour+4, gmtm->tm_mday, gmtm->tm_mon, gmtm->tm_year, gmtm->tm_wday, gmtm->tm_yday, gmtm->tm_isdst);
-    */
 }
