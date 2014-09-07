@@ -22,6 +22,7 @@ public:
     Matrix<float> getX() { return _X; }   
     Matrix<float> getY() { return _Y; }
 
+
 private:
     Matrix<float> _X;
     Matrix<float> _Y;

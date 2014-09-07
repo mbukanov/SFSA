@@ -9,8 +9,8 @@ MOLS::MOLS(std::vector<float> x, std::vector<float> y)
 
 void MOLS::defW()
 {
-    Matrix<float> A(_x.size(), 3);
-    Matrix<float> At(3, _x.size());
+    Matrix<float> A(_x.size(), 2);
+    Matrix<float> At(2, _x.size());
     int i;
 
     // Create Matrix A
@@ -18,19 +18,15 @@ void MOLS::defW()
     {
         A.setElement(i, 1, 1);
         A.setElement(i, 2, _x[i-1]);
-        A.setElement(i, 3, _x[i-1]*_x[i-1]);
     }
 
-    //_A.addElements(A.getElements());
     _X = A;
 
     // At is transposition A
-    //At.setElements((A.Transposition()).getElements());
     At = A.Transposition();
 
     // def W
     _w = ((At.mulMatrix(A)).Reverse()).mulMatrix(At.mulVector(_y)); // lisp? 
-    debugMatrix(_w);
 }
 
 void MOLS::defY()
@@ -38,10 +34,10 @@ void MOLS::defY()
     int i;
     for(i = 1; i <= _X.getSize().rows; i++)
     {
-        float value = _w.getElement(3, 1) * _X.getElement(i, 3) + _w.getElement(2, 1) * _X.getElement(i, 2) + _w.getElement(1, 1);
+        //float value = _w.getElement(3, 1) * _X.getElement(i, 3) + _w.getElement(2, 1) * _X.getElement(i, 2) + _w.getElement(1, 1);
+        float value = _w.getElement(1,1) + _w.getElement(2,1)*_X.getElement(i, 2);
         _Y.addElement(i, 1, value);
     }
-
 
     //_Y = _X.mulMatrix(_w);
 }
@@ -50,6 +46,10 @@ void MOLS::defY()
 // fix this
 float MOLS::defTimeLimit(float sizeLimit)
 {
+    float x = (sizeLimit - _w.getElement(1,1)) / _w.getElement(2,1);
+    return x;
+
+    /*
     // desciminant
     float D = _w.getElement(2,1) * _w.getElement(2,1) - 4 * (_w.getElement(3,1) * (_w.getElement(1,1) - sizeLimit));
     std::cout<<"D: "<<D<<std::endl;
@@ -62,4 +62,5 @@ float MOLS::defTimeLimit(float sizeLimit)
         return x2;
     else
         return x1;
+*/
 }

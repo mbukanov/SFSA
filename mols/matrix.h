@@ -17,6 +17,7 @@ using Elements = std::set<MatrixElement<T>*>;
 
 struct Size 
 {
+	Size() { rows = 0; cols = 0; }
 	int rows; 
 	int cols; 
 };
@@ -67,6 +68,14 @@ public:
 	int Search(T item, bool match, unsigned &uI, unsigned &uJ, unsigned starti, unsigned startj);
 	void swapRows(int row1, int rows2);
 	void swapCols(int col1, int col2);
+
+	/*
+	void operator =(Matrix<T> b)
+	{
+		setSize(b.getSize().rows, b.getSize().cols);
+		setElements(b.getElements());
+	}
+	*/
 
 	void addRow();
 	void addCol();
@@ -252,6 +261,10 @@ template<class T>
 void Matrix<T>::addElement(int i, int j, T value)
 {
 	elements.insert(new MatrixElement<T>(i, j, value));
+	if(size.rows < i)
+		size.rows++;
+	if(size.cols < j)
+		size.cols++;
 }
 
 template<class T> 

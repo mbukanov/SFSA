@@ -21,7 +21,8 @@ std::map<int, double> file_list;
 
 int main(int ac,char *argv[])
 {
-    do_ls((char*)"/home/qeed/Video");
+    //do_ls((char*)"/home/qeed/Video");
+    do_ls((char*)"/backup");
 
     std::map<int, double>::iterator i;
     std::vector<float> xv;
@@ -44,14 +45,16 @@ int main(int ac,char *argv[])
     //A.addElements(mols.getA().getElements());//.mulMatrix(mols.getW());
     A = mols.getX();
 
-    int c = (mols.getX()).getSize().rows;
-    std::cout<<c<<std::endl;
-
     w = mols.getW();
     mols.defY();
 
     Matrix<float> Y = mols.getY();
     Matrix<float> X = mols.getX();
+
+    //debugMatrix(Y);
+
+    // output
+
 
     int rows = Y.getSize().rows;
     Elements<float> elY = Y.getElements();
@@ -88,9 +91,17 @@ int main(int ac,char *argv[])
         std::cout<<(*iter)->first<<"; "<<(*iter)->second<<std::endl;
     }
 
-    std::cout<<"LIMIT: "<<mols.defTimeLimit(80*1024)<<std::endl;
- 
+    int last_i = Y.getSize().rows-1;
+    int last_j = 2;
 
+    float sizeLimit = 150*1024;
+    std::cout<<"FREE SPACE LIMIT: "<<sizeLimit<<std::endl;
+    std::cout<<"Free space ends at: "<<mols.defTimeLimit(sizeLimit) - X.getElement(last_i, last_j)<<" days."<<std::endl;
+
+    sizeLimit = 200*1024;
+    std::cout<<"FREE SPACE LIMIT: "<<sizeLimit<<std::endl;
+    std::cout<<"Free space ends at: "<<mols.defTimeLimit(sizeLimit) - X.getElement(last_i, last_j)<<" days."<<std::endl;
+ 
     return 0;
 }
 
