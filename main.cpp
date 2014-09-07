@@ -21,17 +21,18 @@ std::map<int, double> file_list;
 
 int main(int ac,char *argv[])
 {
-    //do_ls((char*)"/home/qeed/Video");
-    do_ls((char*)"/backup");
+    int t = clock();
+    do_ls((char*)"/home/qeed/Video");
+    //do_ls((char*)"/backup/");
 
     std::map<int, double>::iterator i;
-    std::vector<float> xv;
-    std::vector<float> yv;
-    float sum = 0;
+    std::vector<double> xv;
+    std::vector<double> yv;
+    double sum = 0;
     for(i = file_list.begin(); i != file_list.end(); i++)
     {
         //std::cout<<"day: "<<i->first<<" | bytes: "<<i->second<<std::endl;
-        xv.push_back((float)(i->first));
+        xv.push_back((double)(i->first));
         yv.push_back(i->second + sum);
         sum += i->second;
     }
@@ -39,17 +40,17 @@ int main(int ac,char *argv[])
     MOLS mols(xv, yv);
     mols.defW();
 
-    Matrix<float> A;
-    Matrix<float> w;
-    Matrix<float> b;
+    Matrix<double> A;
+    Matrix<double> w;
+    Matrix<double> b;
     //A.addElements(mols.getA().getElements());//.mulMatrix(mols.getW());
     A = mols.getX();
 
     w = mols.getW();
     mols.defY();
 
-    Matrix<float> Y = mols.getY();
-    Matrix<float> X = mols.getX();
+    Matrix<double> Y = mols.getY();
+    Matrix<double> X = mols.getX();
 
     //debugMatrix(Y);
 
@@ -57,10 +58,10 @@ int main(int ac,char *argv[])
 
 
     int rows = Y.getSize().rows;
-    Elements<float> elY = Y.getElements();
-    Elements<float> elX = X.getElements();
+    Elements<double> elY = Y.getElements();
+    Elements<double> elX = X.getElements();
 
-    std::vector< std::pair<float, float>* > values;
+    std::vector< std::pair<double, double>* > values;
     std::vector<int> skipVector;
     int jj;
     for(jj = 1; jj <= X.getSize().rows; jj++)
@@ -70,11 +71,11 @@ int main(int ac,char *argv[])
             skipVector.push_back(jj-1);
             continue;
         }
-        values.push_back(new std::pair<float, float>(X.getElement(jj, 2), 0));
+        values.push_back(new std::pair<double, double>(X.getElement(jj, 2), 0));
     }
 
 
-    Elements<float>::iterator it;
+    Elements<double>::iterator it;
     int ki = 0;
     for(it = elY.begin(); it != elY.end(); it++)
     {
@@ -85,7 +86,7 @@ int main(int ac,char *argv[])
         ki++;
     }
 
-    std::vector<std::pair<float, float> * >::iterator iter;
+    std::vector<std::pair<double, double> * >::iterator iter;
     for(iter = values.begin(); iter != values.end(); iter++)
     {
         std::cout<<(*iter)->first<<"; "<<(*iter)->second<<std::endl;
@@ -94,13 +95,15 @@ int main(int ac,char *argv[])
     int last_i = Y.getSize().rows-1;
     int last_j = 2;
 
-    float sizeLimit = 150*1024;
+    double sizeLimit = 150*1024; // mb
     std::cout<<"FREE SPACE LIMIT: "<<sizeLimit<<std::endl;
     std::cout<<"Free space ends at: "<<mols.defTimeLimit(sizeLimit) - X.getElement(last_i, last_j)<<" days."<<std::endl;
 
-    sizeLimit = 200*1024;
+    sizeLimit = 200*1024; // mb
     std::cout<<"FREE SPACE LIMIT: "<<sizeLimit<<std::endl;
     std::cout<<"Free space ends at: "<<mols.defTimeLimit(sizeLimit) - X.getElement(last_i, last_j)<<" days."<<std::endl;
+
+    std::cout<<((double)t)/CLOCKS_PER_SEC<<" seconds"<<std::endl;
  
     return 0;
 }
@@ -158,7 +161,7 @@ void show_file_info(char *filename,struct stat *info_p)
     //printf("%-8s",gid_to_name(info_p->st_gid));
     tm* gmtm = gmtime(&(info_p->st_mtime));
     if(gmtm->tm_yday != 0)
-        file_list[gmtm->tm_yday] += (double)info_p->st_size/1024/1024;
+        file_list[gmtm->tm_yday] += (double)info_p->st_size/1024/1024; // MBytes
     //printf("%d ", gmtm->tm_yday);
     //printf("%8ld ", info_p->st_mtime);
 //printf("%8ld ",(long)info_p->st_size);

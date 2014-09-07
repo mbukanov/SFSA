@@ -1,7 +1,7 @@
 #include "mols.h"
 #include <cmath>
 
-MOLS::MOLS(std::vector<float> x, std::vector<float> y)
+MOLS::MOLS(std::vector<double> x, std::vector<double> y)
 {
     _x = x;
     _y = y;
@@ -9,8 +9,8 @@ MOLS::MOLS(std::vector<float> x, std::vector<float> y)
 
 void MOLS::defW()
 {
-    Matrix<float> A(_x.size(), 2);
-    Matrix<float> At(2, _x.size());
+    Matrix<double> A(_x.size(), 2);
+    Matrix<double> At(2, _x.size());
     int i;
 
     // Create Matrix A
@@ -34,8 +34,8 @@ void MOLS::defY()
     int i;
     for(i = 1; i <= _X.getSize().rows; i++)
     {
-        //float value = _w.getElement(3, 1) * _X.getElement(i, 3) + _w.getElement(2, 1) * _X.getElement(i, 2) + _w.getElement(1, 1);
-        float value = _w.getElement(1,1) + _w.getElement(2,1)*_X.getElement(i, 2);
+        //double value = _w.getElement(3, 1) * _X.getElement(i, 3) + _w.getElement(2, 1) * _X.getElement(i, 2) + _w.getElement(1, 1);
+        double value = _w.getElement(1,1) + _w.getElement(2,1)*_X.getElement(i, 2);
         _Y.addElement(i, 1, value);
     }
 
@@ -44,18 +44,18 @@ void MOLS::defY()
 
 
 // fix this
-float MOLS::defTimeLimit(float sizeLimit)
+double MOLS::defTimeLimit(double sizeLimit)
 {
-    float x = (sizeLimit - _w.getElement(1,1)) / _w.getElement(2,1);
+    double x = (sizeLimit - _w.getElement(1,1)) / _w.getElement(2,1);
     return x;
 
     /*
     // desciminant
-    float D = _w.getElement(2,1) * _w.getElement(2,1) - 4 * (_w.getElement(3,1) * (_w.getElement(1,1) - sizeLimit));
+    double D = _w.getElement(2,1) * _w.getElement(2,1) - 4 * (_w.getElement(3,1) * (_w.getElement(1,1) - sizeLimit));
     std::cout<<"D: "<<D<<std::endl;
     std::cout<<"sqrt: "<<sqrt(D)<<std::endl;
-    float x1 = (-_w.getElement(2,1) + sqrt(D)) / (2 * _w.getElement(3,1));
-    float x2 = (-_w.getElement(2,1) - sqrt(D)) / (2 * _w.getElement(3,1));
+    double x1 = (-_w.getElement(2,1) + sqrt(D)) / (2 * _w.getElement(3,1));
+    double x2 = (-_w.getElement(2,1) - sqrt(D)) / (2 * _w.getElement(3,1));
 
     std::cout<<"X1: "<<x1<<std::endl;
     if(x2 > x1)
