@@ -2,7 +2,7 @@
 
 /* fu takim bit' */
 
-class NotificationNONE
+class NotificationNone
 {
 public:
 	virtual void Alert() { std::cout<<"NotificationNONE"<<std::endl; }

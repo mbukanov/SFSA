@@ -12,7 +12,7 @@
 #include <tuple>
 #include <algorithm>
 
-#include "mols/mols.h"
+#include "mols.h"
 
 void do_ls(char*);
 void dostat(char*,char*);
@@ -40,23 +40,20 @@ int main(int argc,char *argv[])
         sum += i->second;
     }
 
-    MOLS mols(xv, yv);
+    MOLS<NotificationNone> mols(xv, yv);
     mols.defW();
 
     Matrix<double> A;
     Matrix<double> w;
     Matrix<double> b;
-    //A.addElements(mols.getA().getElements());//.mulMatrix(mols.getW());
-    A = mols.getX();
 
+    A = mols.getX();
     w = mols.getW();
     mols.defY();
 
     Matrix<double> Y = mols.getY();
     Matrix<double> X = mols.getX();
-
-    //debugMatrix(Y);
-
+ 
     // output
 /*
 
