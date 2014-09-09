@@ -201,11 +201,11 @@ void NotificationEmail::Alert()
 	email.setHost((char*)"smtp.list.ru");
 	email.setPort(25);
 	email.setFrom((char*)"SFSA");
-	email.setMyEmail((char*)"fospam@list.ru");
+	email.setMyEmail((char*)"yourmail@hostname");
 	email.setTo((char*)"dqamex@gmail.com");
 	email.setSubject((char*)"This is SUBJECT!!!");
-	email.setLogin((char*)"fospam");
-	email.setPassword((char*)"Yy8Qkj7vR");
+	email.setLogin((char*)"yourlogin");
+	email.setPassword((char*)"yourpassword");
 	email.setData((char*)"ok");
 
 	email.Send();
