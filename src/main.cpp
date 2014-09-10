@@ -12,6 +12,7 @@
 #include <tuple>
 #include <algorithm>
 
+#include "iniparser.h"
 #include "mols.h"
 
 void do_ls(char*);
@@ -25,7 +26,11 @@ int main(int argc,char *argv[])
     long mtime, secs, usecs;    
     gettimeofday(&start, NULL);
 
-    do_ls((char*)"/home/qeed/Video");
+    IniParser config((char*)"config.ini");
+    char path[256];
+    strcpy(path, config.getValFromArg("global", "path").c_str());
+    do_ls(path);
+    //do_ls((char*)"/home/qeed/Video");
     //do_ls((char*)"/backup/");
 
     std::map<int, double>::iterator i;
@@ -40,19 +45,27 @@ int main(int argc,char *argv[])
         sum += i->second;
     }
 
-    MOLS<NotificationNone> mols(xv, yv);
-    mols.defW();
+    /* Notification Type */
+    BaseMOLS* mols;
+    std::string type = config.getValFromArg("alert", "type");
+    if(type == "email")
+        mols = new MOLS<NotificationEmail>(xv, yv);
+    // if(type == ...) mols = new ...
+    else
+        mols = new MOLS<NotificationNone>(xv, yv);
+
+    mols->defW();
 
     Matrix<double> A;
     Matrix<double> w;
     Matrix<double> b;
 
-    A = mols.getX();
-    w = mols.getW();
-    mols.defY();
+    A = mols->getX();
+    w = mols->getW();
+    mols->defY();
 
-    Matrix<double> Y = mols.getY();
-    Matrix<double> X = mols.getX();
+    Matrix<double> Y = mols->getY();
+    Matrix<double> X = mols->getX();
  
     // output
 /*
@@ -97,13 +110,18 @@ int main(int argc,char *argv[])
     int last_i = Y.getSize().rows-1;
     int last_j = 2;
 
-    double sizeLimit = 150*1024; // mb
+    double sizeLimit = stod(config.getValFromArg("global", "size_limit")); // mb
+    double freeSpaceEnd = mols->defTimeLimit(sizeLimit) - X.getElement(last_i, last_j);
     std::cout<<"FREE SPACE LIMIT: "<<sizeLimit<<std::endl;
-    std::cout<<"Free space ends at: "<<mols.defTimeLimit(sizeLimit) - X.getElement(last_i, last_j)<<" days."<<std::endl;
+    std::cout<<"Free space ends at: "<<freeSpaceEnd<<" days."<<std::endl;
 
-    sizeLimit = 200*1024; // mb
-    std::cout<<"FREE SPACE LIMIT: "<<sizeLimit<<std::endl;
-    std::cout<<"Free space ends at: "<<mols.defTimeLimit(sizeLimit) - X.getElement(last_i, last_j)<<" days."<<std::endl;
+    int alert = stoi(config.getValFromArg("global", "alert"));
+    if(alert)
+    {
+        double size_limit_alert = stod(config.getValFromArg("global", "size_limit_alert"));
+        if(size_limit_alert >= freeSpaceEnd)
+            mols->Alert();
+    }
 
 
     gettimeofday(&end, NULL);
@@ -111,8 +129,6 @@ int main(int argc,char *argv[])
     usecs = end.tv_usec - start.tv_usec;
     mtime = ((secs) * 1000 + usecs/1000.0) + 0.5;
     printf("Elapsed time: %ld millisecs\n", mtime);
-    
-    mols.Alert();
     return 0;
 }
 

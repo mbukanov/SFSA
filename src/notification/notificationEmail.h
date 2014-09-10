@@ -1,6 +1,7 @@
 #include <iostream>
 #include <netdb.h>
 #include "../base64.h"
+#include "../baseMols.h"
 
 #define bzero(ptr) memset(ptr, 0, sizeof(ptr))
 
@@ -188,7 +189,7 @@ int SimpleEmailSender::Send()
 	return 0;
 }
 
-class NotificationEmail
+class NotificationEmail : public BaseMOLS
 {
 public:
 	virtual void Alert();
@@ -210,7 +211,3 @@ void NotificationEmail::Alert()
 
 	email.Send();
 }
-
-
-
-

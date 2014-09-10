@@ -14,9 +14,9 @@ I dont know.
 /*
 You can choose notification type
 */
-
+ 
 template<class NotificationClass>
-class MOLS  : public Notification< NotificationClass >
+class MOLS  : public Notification< NotificationClass > 
 {
 public:
     MOLS() {}

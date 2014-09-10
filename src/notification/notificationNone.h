@@ -1,8 +1,7 @@
 #include <iostream>
+#include "../baseMols.h"
 
-/* fu takim bit' */
-
-class NotificationNone
+class NotificationNone : public BaseMOLS
 {
 public:
 	virtual void Alert() { std::cout<<"NotificationNONE"<<std::endl; }
