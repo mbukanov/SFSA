@@ -20,6 +20,7 @@
         IniParser(char *filename_);
         void setIniFile(char *filename_);
         void show();
+        std::map<std::string, std::map<std::string, std::string> > getAll();
         std::string getValFromArg(std::string section_, std::string arg_);
         std::string getArgFromVal(std::string section_, std::string val_);
         bool changeValue(std::string section_, std::string arg_, std::string new_val_);

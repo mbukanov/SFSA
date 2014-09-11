@@ -2,8 +2,18 @@
 #include <netdb.h>
 #include "../base64.h"
 #include "../baseMols.h"
+#include "../config.h"
 
 #define bzero(ptr) memset(ptr, 0, sizeof(ptr))
+
+
+bool isCharStringEmpty(char* str)
+{
+	std::cout<<"STR:"<<str<<std::endl;
+	if(!strlen(str))
+		return true;
+	return false;
+}
 
 
 class SimpleEmailSender
@@ -126,9 +136,19 @@ int SimpleEmailSender::Send()
 {
 	if(connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0)
 	{
-		printf("Connect error\n");
+		throw "Connect error";
 		return -1;
 	}
+	if(isCharStringEmpty(hostname))
+		throw (char const*)"Hostname is empty";
+	if(isCharStringEmpty(login))
+		throw (char const*)"Login is empty";
+	if(isCharStringEmpty(password))
+		throw (char const*)"Password is empty";
+	if(isCharStringEmpty(from))
+		throw (char const*)"From is empty";
+	if(isCharStringEmpty(to))
+		throw (char const*)"'To' is empty";
 
 	char buff[256];
 	bzero(buff);
@@ -179,7 +199,7 @@ int SimpleEmailSender::Send()
 	strcat(buff, to);
 	strcat(buff, (char*)"\r\nSubject:");
 	strcat(buff, subject);
-	strcat(buff, (char*)"\r\n");
+	strcat(buff, (char*)"\r\n\r\n");
 	strcat(buff, data);
 	strcat(buff, (char*)"\r\n.\r\n");
 	sendPacket(sockfd, buff);
@@ -199,6 +219,18 @@ private:
 void NotificationEmail::Alert()
 {
 	SimpleEmailSender email;
+
+	email.setHost((char*) Config::Instance()->get("email", "hostname").c_str());
+	email.setPort(std::stoi(Config::Instance()->get("email", "port").c_str()));
+	email.setFrom((char*) Config::Instance()->get("email", "from").c_str());
+	email.setTo((char*) Config::Instance()->get("email", "to").c_str());
+	email.setMyEmail((char*) Config::Instance()->get("email", "email").c_str());
+	email.setSubject((char*) Config::Instance()->get("email", "subject").c_str());
+	email.setLogin((char*) Config::Instance()->get("email", "login").c_str());
+	email.setPassword((char*) Config::Instance()->get("email", "password").c_str());
+	email.setData((char*) Config::Instance()->get("email", "data").c_str());
+
+/*
 	email.setHost((char*)"smtp.list.ru");
 	email.setPort(25);
 	email.setFrom((char*)"SFSA");
@@ -208,6 +240,12 @@ void NotificationEmail::Alert()
 	email.setLogin((char*)"yourlogin");
 	email.setPassword((char*)"yourpassword");
 	email.setData((char*)"ok");
-
-	email.Send();
+*/
+	try
+	{
+		email.Send();
+	}catch(char const* e){
+		std::cout<<"ERROR: "<<e<<std::endl;
+		exit(0);
+	}
 }

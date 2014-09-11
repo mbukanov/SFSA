@@ -12,7 +12,7 @@
 #include <tuple>
 #include <algorithm>
 
-#include "iniparser.h"
+#include "config.h"
 #include "mols.h"
 
 void do_ls(char*);
@@ -26,9 +26,9 @@ int main(int argc,char *argv[])
     long mtime, secs, usecs;    
     gettimeofday(&start, NULL);
 
-    IniParser config((char*)"config.ini");
     char path[256];
-    strcpy(path, config.getValFromArg("global", "path").c_str());
+    strcpy(path, Config::Instance()->get("global", "path").c_str());
+//    strcpy(path, config.getValFromArg("global", "path").c_str());
     do_ls(path);
     //do_ls((char*)"/home/qeed/Video");
     //do_ls((char*)"/backup/");
@@ -47,7 +47,8 @@ int main(int argc,char *argv[])
 
     /* Notification Type */
     BaseMOLS* mols;
-    std::string type = config.getValFromArg("alert", "type");
+    std::string type = Config::Instance()->get("alert", "type");
+//    std::string type = config.getValFromArg("alert", "type");
     if(type == "email")
         mols = new MOLS<NotificationEmail>(xv, yv);
     // if(type == ...) mols = new ...
@@ -109,16 +110,20 @@ int main(int argc,char *argv[])
 
     int last_i = Y.getSize().rows-1;
     int last_j = 2;
+    std::cout<<"OK: "<<Config::Instance()->get("global", "size_limit")<<std::endl;
 
-    double sizeLimit = stod(config.getValFromArg("global", "size_limit")); // mb
+    double sizeLimit = std::stod(Config::Instance()->get("global", "size_limit"));
+//    double sizeLimit = stod(config.getValFromArg("global", "size_limit")); // mb
     double freeSpaceEnd = mols->defTimeLimit(sizeLimit) - X.getElement(last_i, last_j);
     std::cout<<"FREE SPACE LIMIT: "<<sizeLimit<<std::endl;
     std::cout<<"Free space ends at: "<<freeSpaceEnd<<" days."<<std::endl;
 
-    int alert = stoi(config.getValFromArg("global", "alert"));
+    int alert = stoi(Config::Instance()->get("global", "alert"));
+//    int alert = stoi(config.getValFromArg("global", "alert"));
     if(alert)
     {
-        double size_limit_alert = stod(config.getValFromArg("global", "size_limit_alert"));
+        double size_limit_alert = std::stod(Config::Instance()->get("global", "size_limit_alert"));
+//        double size_limit_alert = stod(config.getValFromArg("global", "size_limit_alert"));
         if(size_limit_alert >= freeSpaceEnd)
             mols->Alert();
     }

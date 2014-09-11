@@ -25,11 +25,41 @@ void IniParser::show()
     }
 }
 
+std::map<std::string, std::map<std::string, std::string> > IniParser::getAll()
+{
+    std::map<std::string, std::map<std::string, std::string> > values;
+
+    for(Inidata::iterator its = inidata.begin(); its != inidata.end(); its++ )
+    {
+        // it - section
+        //std::cout<<"Section: "<<its->first<<std::endl;
+
+        for(Entries::iterator ite = its->second.begin(); ite != its->second.end(); ite++)
+        {
+            // ite - entry
+            //std::cout<<"Entry: "<<ite->first<<" |=| "<<ite->second<<std::endl;
+            std::string section = (its->first).substr(1, (its->first).size()-2);
+            values[section][ite->first] = ite->second;
+            //std::cout<<(its->first).substr(1, (its->first).size()-2)<<" - "<<ite->first<<" - "<<ite->second<<std::endl;
+        }
+
+    }
+
+    return values;
+
+}
+
 void IniParser::setIniFile(char *filename_)
 {
     this->filename = (const char*)filename_;
     std::ifstream file;
     file.open(filename_, std::ios_base::in);
+
+    if(!file.is_open())
+    {
+        std::cout<<"File not open"<<std::endl;
+        exit(0);
+    }
 
 
     Section section;
@@ -66,6 +96,8 @@ void IniParser::setIniFile(char *filename_)
     }
 
     inidata.push_back(section);
+
+    file.close();
 
 
 
