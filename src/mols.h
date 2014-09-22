@@ -66,7 +66,7 @@ void MOLS<T>::defW()
     At = A.Transposition();
 
     // def W
-    _w = ((At.mulMatrix(A)).Reverse()).mulMatrix(At.mulVector(_y)); // lisp? 
+    _w = ((At * A).Reverse()) * (At * _y); // lisp? 
 }
 
 template<class T>

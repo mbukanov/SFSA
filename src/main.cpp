@@ -40,6 +40,7 @@ int main(int argc,char *argv[])
     for(i = file_list.begin(); i != file_list.end(); i++)
     {
         //std::cout<<"day: "<<i->first<<" | bytes: "<<i->second<<std::endl;
+        if(i->second <= 10) continue;
         xv.push_back((double)(i->first));
         yv.push_back(i->second + sum);
         sum += i->second;
@@ -156,6 +157,7 @@ void do_ls(char *dirname)
                     if(newdir[strlen(dirname)-1] != '/') strcat(newdir, "/");
                     strcat(newdir, direntp->d_name);
                     do_ls(newdir);
+                    delete[] newdir;
                 }else
                 if(direntp->d_type != DT_LNK)
                     dostat(direntp->d_name,dirname);

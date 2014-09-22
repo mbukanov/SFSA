@@ -62,8 +62,8 @@ public:
 	MatrixElement<T>* getElementPoint(int i, int j);
 	Matrix<T> Transposition();
 	Matrix<T> Reverse();
-	Matrix<T> mulMatrix(Matrix m);
-	Matrix<T> mulVector(std::vector<T> v);
+	Matrix<T> operator*(Matrix m);
+	Matrix<T> operator*(std::vector<T> v);
 	T Determinant();
 	int Search(T item, bool match, unsigned &uI, unsigned &uJ, unsigned starti, unsigned startj);
 	void swapRows(int row1, int rows2);
@@ -294,8 +294,9 @@ MatrixElement<T>* Matrix<T>::getElementPoint(int i, int j)
 	return NULL;
 }
 
+// matrxA * matrixB
 template<class T>
-Matrix<T> Matrix<T>::mulMatrix(Matrix m)
+Matrix<T> Matrix<T>::operator*(Matrix m)
 {
 	Matrix<T> newMatrix(this->size.rows, m.getSize().cols);
 	if(size.cols != m.getSize().rows)
@@ -320,8 +321,9 @@ Matrix<T> Matrix<T>::mulMatrix(Matrix m)
 	return newMatrix;
 }
 
+// matrixA * vectorB
 template<class T>
-Matrix<T> Matrix<T>::mulVector(std::vector<T> v)
+Matrix<T> Matrix<T>::operator*(std::vector<T> v)
 {
 	// 1 column , v.size() rows
 	Matrix<T> newMatrix(v.size(), 1);
@@ -334,7 +336,7 @@ Matrix<T> Matrix<T>::mulVector(std::vector<T> v)
 		newMatrix.setElement(i, 1, v[i-1]);
 	}
 
-	return srcMatrix.mulMatrix(newMatrix);
+	return srcMatrix * newMatrix;	
 }
 
 template<class T>
