@@ -1,6 +1,12 @@
 #ifndef NOTIFICATIONEMAIL_H
 #define NOTIFICATIONEMAIL_H
 
+/*
+note: pattern Strategy
+
+ConcreteStrategy NotificationEmail
+*/
+
 
 #include <iostream>
 #include <netdb.h>

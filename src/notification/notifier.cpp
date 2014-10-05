@@ -1,5 +1,11 @@
 #include "notifier.h"
 
+/*
+note: pattern Strategy
+
+Context
+*/
+
 Notifier::~Notifier()
 {
 	delete _notification;

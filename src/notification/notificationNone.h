@@ -1,6 +1,13 @@
 #ifndef NOTIFICATIONNONE_H
 #define NOTIFICATIONNONE_H
 
+/*
+note: pattern Strategy
+
+ConcreteStrategy NotificationNone
+*/
+
+
 #include <iostream>
 #include "notification.h"
 
