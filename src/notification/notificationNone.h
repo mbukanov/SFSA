@@ -1,9 +1,15 @@
-#include <iostream>
-#include "../baseMols.h"
+#ifndef NOTIFICATIONNONE_H
+#define NOTIFICATIONNONE_H
 
-class NotificationNone : public BaseMOLS
+#include <iostream>
+#include "notification.h"
+
+
+class NotificationNone : public Notification
 {
 public:
 	virtual void Alert() { std::cout<<"NotificationNONE"<<std::endl; }
 private:
 };
+
+#endif

@@ -69,14 +69,6 @@ public:
 	void swapRows(int row1, int rows2);
 	void swapCols(int col1, int col2);
 
-	/*
-	void operator =(Matrix<T> b)
-	{
-		setSize(b.getSize().rows, b.getSize().cols);
-		setElements(b.getElements());
-	}
-	*/
-
 	void addRow();
 	void addCol();
 

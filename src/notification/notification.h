@@ -1,8 +1,13 @@
-#include <iostream>
-#include "notificationNone.h"
-#include "notificationEmail.h"
+#ifndef NOTIFICATION_H
+#define NOTIFICATION_H
 
 
-template<class NotificationParent>
-class Notification	:	public NotificationParent
-{};
+class Notification
+{
+public:
+	virtual ~Notification(){}
+	virtual void Alert() = 0;
+};
+
+
+#endif

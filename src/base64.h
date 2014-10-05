@@ -1,3 +1,6 @@
+#ifndef BASE64_H
+#define BASE64_H
+
 // gcc -o base64 Main.c Base64Encode.c Base64Decode.c -lcrypto -lm
 #include <openssl/bio.h>
 #include <openssl/evp.h>
@@ -57,3 +60,6 @@ int base64_encode(const char* message, char** buffer) { //Encodes a string to ba
 
   return (0); //success
 }
+
+
+#endif

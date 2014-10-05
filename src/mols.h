@@ -9,14 +9,8 @@ I dont know.
 #include <iostream>
 #include <vector>
 #include "matrix.h"
-#include "notification/notification.h"
 
-/*
-You can choose notification type
-*/
- 
-template<class NotificationClass>
-class MOLS  : public Notification< NotificationClass > 
+class MOLS
 {
 public:
     MOLS() {}
@@ -37,17 +31,16 @@ private:
 
     std::vector<double> _x;
     std::vector<double> _y;
+
 };
 
-template<class T>
-MOLS<T>::MOLS(std::vector<double> x, std::vector<double> y)
+MOLS::MOLS(std::vector<double> x, std::vector<double> y)
 {
     _x = x;
     _y = y;
 }
 
-template<class T>
-void MOLS<T>::defW()
+void MOLS::defW()
 {
     Matrix<double> A(_x.size(), 2);
     Matrix<double> At(2, _x.size());
@@ -69,8 +62,7 @@ void MOLS<T>::defW()
     _w = ((At * A).Reverse()) * (At * _y); // lisp? 
 }
 
-template<class T>
-void MOLS<T>::defY()
+void MOLS::defY()
 {
     int i;
     for(i = 1; i <= _X.getSize().rows; i++)
@@ -81,8 +73,7 @@ void MOLS<T>::defY()
 }
 
 
-template<class T>
-double MOLS<T>::defTimeLimit(double sizeLimit)
+double MOLS::defTimeLimit(double sizeLimit)
 {
     double x = (sizeLimit - _w.getElement(1,1)) / _w.getElement(2,1);
     return x;

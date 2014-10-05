@@ -9,6 +9,7 @@ IniParser::IniParser(char * filename_)
     this->setIniFile(filename_);
 }
 
+// debug
 void IniParser::show()
 {
     for(Inidata::iterator its = inidata.begin(); its != inidata.end(); its++ )
@@ -31,18 +32,13 @@ std::map<std::string, std::map<std::string, std::string> > IniParser::getAll()
 
     for(Inidata::iterator its = inidata.begin(); its != inidata.end(); its++ )
     {
-        // it - section
-        //std::cout<<"Section: "<<its->first<<std::endl;
-
+        // its - section
         for(Entries::iterator ite = its->second.begin(); ite != its->second.end(); ite++)
         {
             // ite - entry
-            //std::cout<<"Entry: "<<ite->first<<" |=| "<<ite->second<<std::endl;
             std::string section = (its->first).substr(1, (its->first).size()-2);
             values[section][ite->first] = ite->second;
-            //std::cout<<(its->first).substr(1, (its->first).size()-2)<<" - "<<ite->first<<" - "<<ite->second<<std::endl;
         }
-
     }
 
     return values;
@@ -57,7 +53,7 @@ void IniParser::setIniFile(char *filename_)
 
     if(!file.is_open())
     {
-        std::cout<<"File not open"<<std::endl;
+        std::cout<<"INIPARSER: File not open"<<std::endl;
         exit(0);
     }
 
@@ -98,61 +94,6 @@ void IniParser::setIniFile(char *filename_)
     inidata.push_back(section);
 
     file.close();
-
-
-
-
-
-/*
-    if(file.is_open())
-    {
-        while(!file.eof())
-        {
-            std::string str;
-            file >> str;
-            if(str[0] == '[')   // if section
-            {
-                if(entries != NULL)
-                {
-                    section->second = *entries;
-                    inidata.push_back(*section);
-                    delete entries;
-                    delete section;
-                    section = NULL;
-                    entries = NULL;
-                }
-                section = new Section;
-                section->first = this->str_remlrchars(str);
-            }else if(!str.empty()){              // if entry
-                std::vector<std::string> r = this->str_split('=', str);
-
-                entry = new Entry;
-                entry->first = r[0];
-                entry->second = r[1];
-                if(entries == NULL)
-                    entries = new Entries;
-                entries->push_back(*entry);
-                delete entry;
-                entry = NULL;
-            }
-        }
-        if(file.eof())
-        {
-            if(entries != NULL)
-            {
-                section->second = *entries;
-                inidata.push_back(*section);
-                delete entries;
-                delete section;
-                section = NULL;
-                entries = NULL;
-            }
-        }
-
-    }else{
-        std::cout<<"file not found."<<std::endl;
-    }
-*/
 }
 
 std::string IniParser::convertToIniString()

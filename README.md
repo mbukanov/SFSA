@@ -3,4 +3,6 @@ SFSA
 
 My Simple Free Space Analizer
 
-ok
+TODO  
+-----  
+email: ssl

@@ -1,11 +1,16 @@
 #ifndef INIPARSER_H
 #define INIPARSER_H
 
+/*
+    qeed
+*/
+
 #include <iostream>
 #include <list>
 #include <vector>
 #include <map>
 #include <fstream>
+#include <stdlib.h>
 #include <iterator>
 
     typedef std::pair<std::string, std::string> Entry;

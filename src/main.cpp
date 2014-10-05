@@ -12,7 +12,8 @@
 #include <tuple>
 #include <algorithm>
 
-#include "config.h"
+#include "notification/notifier.h"
+#include "IConfig/IConfig.h"
 #include "mols.h"
 
 void do_ls(char*);
@@ -27,11 +28,9 @@ int main(int argc,char *argv[])
     gettimeofday(&start, NULL);
 
     char path[256];
-    strcpy(path, Config::Instance()->get("global", "path").c_str());
-//    strcpy(path, config.getValFromArg("global", "path").c_str());
+    strcpy(path, IConfig::Instance()->get("global", "path").c_str());
     do_ls(path);
-    //do_ls((char*)"/home/qeed/Video");
-    //do_ls((char*)"/backup/");
+    
 
     std::map<int, double>::iterator i;
     std::vector<double> xv;
@@ -39,7 +38,6 @@ int main(int argc,char *argv[])
     double sum = 0;
     for(i = file_list.begin(); i != file_list.end(); i++)
     {
-        //std::cout<<"day: "<<i->first<<" | bytes: "<<i->second<<std::endl;
         if(i->second <= 10) continue;
         xv.push_back((double)(i->first));
         yv.push_back(i->second + sum);
@@ -47,14 +45,15 @@ int main(int argc,char *argv[])
     }
 
     /* Notification Type */
-    BaseMOLS* mols;
-    std::string type = Config::Instance()->get("alert", "type");
+    MOLS *mols = new MOLS(xv, yv);
+    Notifier *notifier = NULL;
+    std::string type = IConfig::Instance()->get("alert", "type");
 //    std::string type = config.getValFromArg("alert", "type");
     if(type == "email")
-        mols = new MOLS<NotificationEmail>(xv, yv);
-    // if(type == ...) mols = new ...
+        notifier = new Notifier(new NotificationEmail());
+    // if(type == ...) notifier = new ...
     else
-        mols = new MOLS<NotificationNone>(xv, yv);
+        notifier = new Notifier(new NotificationNone());
 
     mols->defW();
 
@@ -69,64 +68,24 @@ int main(int argc,char *argv[])
     Matrix<double> Y = mols->getY();
     Matrix<double> X = mols->getX();
  
-    // output
-/*
-
-    int rows = Y.getSize().rows;
-    Elements<double> elY = Y.getElements();
-    Elements<double> elX = X.getElements();
-
-    std::vector< std::pair<double, double>* > values;
-    std::vector<int> skipVector;
-    int jj;
-    for(jj = 1; jj <= X.getSize().rows; jj++)
-    {
-        if(X.getElement(jj, 2) == 0)
-        {
-            skipVector.push_back(jj-1);
-            continue;
-        }
-        values.push_back(new std::pair<double, double>(X.getElement(jj, 2), 0));
-    }
-
-
-    Elements<double>::iterator it;
-    int ki = 0;
-    for(it = elY.begin(); it != elY.end(); it++)
-    {
-        if(std::find(skipVector.begin(), skipVector.end(), ki) != skipVector.end())
-            continue;
-
-        values[ki]->second = (*it)->getValue();
-        ki++;
-    }
-
-    std::vector<std::pair<double, double> * >::iterator iter;
-    for(iter = values.begin(); iter != values.end(); iter++)
-    {
-        std::cout<<(*iter)->first<<"; "<<(*iter)->second<<std::endl;
-    }
-
-    */
-
     int last_i = Y.getSize().rows-1;
     int last_j = 2;
-    std::cout<<"OK: "<<Config::Instance()->get("global", "size_limit")<<std::endl;
+    std::cout<<"OK: "<<IConfig::Instance()->get("global", "size_limit")<<std::endl;
 
-    double sizeLimit = std::stod(Config::Instance()->get("global", "size_limit"));
-//    double sizeLimit = stod(config.getValFromArg("global", "size_limit")); // mb
+    double sizeLimit = std::stod(IConfig::Instance()->get("global", "size_limit"));
     double freeSpaceEnd = mols->defTimeLimit(sizeLimit) - X.getElement(last_i, last_j);
+    
     std::cout<<"FREE SPACE LIMIT: "<<sizeLimit<<std::endl;
     std::cout<<"Free space ends at: "<<freeSpaceEnd<<" days."<<std::endl;
 
-    int alert = stoi(Config::Instance()->get("global", "alert"));
+    int alert = stoi(IConfig::Instance()->get("global", "alert"));
 //    int alert = stoi(config.getValFromArg("global", "alert"));
     if(alert)
     {
-        double size_limit_alert = std::stod(Config::Instance()->get("global", "size_limit_alert"));
+        double size_limit_alert = std::stod(IConfig::Instance()->get("global", "size_limit_alert"));
 //        double size_limit_alert = stod(config.getValFromArg("global", "size_limit_alert"));
         if(size_limit_alert >= freeSpaceEnd)
-            mols->Alert();
+            notifier->Alert();
     }
 
 
