@@ -1,2 +1,2 @@
 all:
-	g++ main.cpp notification/notifier.h notification/notifier.cpp notification/notificationEmail.h notification/notificationNone.h notification/SimpleEmailSender.h notification/SimpleEmailSender.cpp IConfig/IConfig.cpp IConfig/IConfig.h IConfig/iniparser.h IConfig/iniparser.cpp -o ../release/result -lcrypto -lm -std=c++11
+	g++ main.cpp base64.h base64.cpp notification/notifier.h notification/notifier.cpp notification/notificationEmail.h notification/notificationNone.h notification/SimpleEmailSender.h notification/SimpleEmailSender.cpp notification/SSLSimpleEmailSender.h notification/SSLSimpleEmailSender.cpp IConfig/IConfig.cpp IConfig/IConfig.h IConfig/iniparser.h IConfig/iniparser.cpp -o ../release/result -lssl -lcrypto -lm -std=c++11

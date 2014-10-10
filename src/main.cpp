@@ -20,9 +20,11 @@ void do_ls(char*);
 void dostat(char*,char*);
 
 std::map<int, double> file_list;
+unsigned long size;
 
 int main(int argc,char *argv[])
 {
+    size = 0;
     struct timeval start, end;
     long mtime, secs, usecs;    
     gettimeofday(&start, NULL);
@@ -30,18 +32,26 @@ int main(int argc,char *argv[])
     char path[256];
     strcpy(path, IConfig::Instance()->get("global", "path").c_str());
     do_ls(path);
-    
+
+    double tmp = 0;
+    for(std::map<int, double>::iterator it = file_list.begin(); it != file_list.end(); it++)
+    {
+        it->second += tmp;
+        tmp = it->second;
+    }
+
+    for(std::map<int, double>::iterator it = file_list.begin(); it != file_list.end(); it++)
+    {
+        std::cout<<it->first<<";"<<it->second<<std::endl;
+    }
 
     std::map<int, double>::iterator i;
     std::vector<double> xv;
     std::vector<double> yv;
-    double sum = 0;
     for(i = file_list.begin(); i != file_list.end(); i++)
     {
-        if(i->second <= 10) continue;
         xv.push_back((double)(i->first));
-        yv.push_back(i->second + sum);
-        sum += i->second;
+        yv.push_back(i->second);
     }
 
     /* Notification Type */
@@ -141,7 +151,9 @@ void dostat(char *filename,char *dirname)
     }else{
         tm* gmtm = gmtime(&(info.st_mtime));
         if(gmtm->tm_yday != 0)
+        {
             file_list[gmtm->tm_yday] += (double)info.st_size/1024/1024; // MBytes
+        }
     }
     //show_file_info(filename,&info);
     delete way_to_file;

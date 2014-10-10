@@ -11,7 +11,7 @@ ConcreteStrategy NotificationEmail
 #include <iostream>
 #include <netdb.h>
 #include "notification.h"
-#include "SimpleEmailSender.h"
+#include "SSLSimpleEmailSender.h"
 #include "../IConfig/IConfig.h"
 
 #define bzero(ptr) memset(ptr, 0, sizeof(ptr))
@@ -22,10 +22,10 @@ class NotificationEmail : public Notification
 public:
 	virtual void Alert()
 	{
-		SimpleEmailSender email;
+		SSLSimpleEmailSender email;
 
 		email.setHost((char*) IConfig::Instance()->get("email", "hostname").c_str());
-		email.setPort(std::stoi(IConfig::Instance()->get("email", "port").c_str()));
+		email.setPort(IConfig::Instance()->get("email", "port").c_str());
 		email.setFrom((char*) IConfig::Instance()->get("email", "from").c_str());
 		email.setTo((char*) IConfig::Instance()->get("email", "to").c_str());
 		email.setMyEmail((char*) IConfig::Instance()->get("email", "email").c_str());
@@ -33,6 +33,8 @@ public:
 		email.setLogin((char*) IConfig::Instance()->get("email", "login").c_str());
 		email.setPassword((char*) IConfig::Instance()->get("email", "password").c_str());
 		email.setData((char*) IConfig::Instance()->get("email", "data").c_str());
+		
+		email.connect();
 		
 		try
 		{
