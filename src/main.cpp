@@ -60,7 +60,7 @@ int main(int argc,char *argv[])
     std::string type = IConfig::Instance()->get("alert", "type");
 //    std::string type = config.getValFromArg("alert", "type");
     if(type == "email")
-        notifier = new Notifier(new NotificationEmail());
+        notifier = new Notifier(new NotificationEmail<>());
     // if(type == ...) notifier = new ...
     else
         notifier = new Notifier(new NotificationNone());

@@ -16,13 +16,13 @@ ConcreteStrategy NotificationEmail
 
 #define bzero(ptr) memset(ptr, 0, sizeof(ptr))
 
-
+template<typename NotifierMember = SSLSimpleEmailSender>
 class NotificationEmail : public Notification
 {
 public:
 	virtual void Alert()
 	{
-		SSLSimpleEmailSender email;
+		NotifierMember email;
 
 		email.setHost((char*) IConfig::Instance()->get("email", "hostname").c_str());
 		email.setPort(IConfig::Instance()->get("email", "port").c_str());
